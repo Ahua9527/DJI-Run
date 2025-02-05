@@ -14,7 +14,7 @@ export default {
       },
       colors: {
         selected: '#3366FF',
-        resolve: '#41AF45',
+        rec: '#A91D1F',
         light: {
           'bg': '#F1F1F1',
           'card': '#F9F9F9',

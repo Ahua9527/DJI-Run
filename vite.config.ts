@@ -32,7 +32,7 @@ export default defineConfig({
       manifest: {
         name: 'DJI-Run',
         short_name: 'DJI-Run',
-        description: '从ALE到CDL，炼出色彩真金',
+        description: '为每一帧元数据保驾护航',
         theme_color: '#171717',
         background_color: '#171717',
         display: 'standalone',

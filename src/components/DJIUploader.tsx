@@ -50,7 +50,7 @@ const DJIUploader = () => {
     URL.revokeObjectURL(url);
   };
 
-  // 默认导出合并后的 CSV 文件，不再使用单独合并按钮
+
   const handleProcess = async () => {
     if (!files.length) return;
     setProcessing(true);
@@ -61,7 +61,7 @@ const DJIUploader = () => {
         setCurrentFile(file.name);
         setProgress((i / files.length) * 100);
         try {
-          // 调用合并函数，返回合并后的 CSV 文件
+         // 调用合并函数，返回合并后的 CSV 文件 
           const result = await convertDBtoMergedCSV(file);
           // 直接触发下载合并后的 CSV 文件
           downloadBlob(result.data, result.filename);
@@ -81,13 +81,13 @@ const DJIUploader = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-light-bg dark:bg-dark-bg transition-all duration-500 ease-in-out">
-      <main className="flex-grow flex items-center justify-center p-6 pb-32">
-        <div className="w-full max-w-2xl bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-10 min-h-[400px]">
-          <h1 className="text-4xl font-chalkboard font-bold text-gray-900 dark:text-white mt-8 mb-2 text-center tracking-wide">
-            DJI<span className="text-resolve">CSV</span>
+     <main className="flex-grow flex items-center justify-center p-6 pb-32 bg-light-bg dark:bg-dark-bg">
+     <div className="w-full max-w-2xl bg-light-card dark:bg-dark-card rounded-2xl shadow-xl p-10 min-h-[400px] transition-all duration-500 ease-in-out">
+     <h1 className="text-4xl font-chalkboard font-bold text-gray-900 dark:text-white mt-8 mb-2 text-center tracking-wide transition-colors duration-500 ease-in-out [filter:drop-shadow(4px_8px_12px_rgba(0,0,0,0.3))]">
+            DJI<span className="text-rec">Run</span>
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-12 text-center">
-            DJI数据库转换工具
+          为每一帧元数据保驾护航
           </p>
 
           {/* 文件上传和拖拽区域 */}
@@ -117,9 +117,9 @@ const DJIUploader = () => {
               />
               <div className="text-center">
                 <Database className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {/* <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   DJI数据库转CSV工具
-                </p>
+                </p> */}
                 <p className="mt-1 text-sm text-blue-500 hover:text-blue-500">
                   点击或拖拽数据库文件到此处
                 </p>
@@ -130,7 +130,7 @@ const DJIUploader = () => {
           {/* 文件列表、进度和导出按钮 */}
           {files.length > 0 && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center my-2">
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   已上传文件 ({files.length})
                 </h3>
@@ -198,6 +198,23 @@ const DJIUploader = () => {
           )}
         </div>
       </main>
+      <footer className="fixed bottom-0 w-full bg-gradient-to-t from-light-bg/95 via-light-bg/80 to-light-bg/0 dark:from-dark-bg/95 dark:via-dark-bg/80 dark:to-dark-bg/0">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-center space-x-6">
+            <a
+              href="https://github.com/Ahua9527/DJI-Run"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-selected"
+            >
+              <span>GitHub</span>
+            </a>
+          </div>
+          <p className="mt-2 text-xs text-center text-gray-500 dark:text-gray-400">
+          DJI-Run © 2025 | Designed & Developed by 哆啦Ahua🌱
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
