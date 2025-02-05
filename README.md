@@ -11,7 +11,7 @@
 
 </div>
 
-DJI-Run 是一款用于 **提取并修正 DJI Ronin 4D 及 Inspire 3 设备 Sensor FPS 元数据** 的工具。它能将 DJI 设备存储卡中的 SQLite 数据库转换为 CSV 格式，帮助数字影像工程师（DIT）正确管理拍摄数据，特别适用于 **CINITY特制工作流**。
+DJI-Run 是一款用于 **提取并修正 DJI Ronin 4D 及 Inspire 3 设备 Sensor FPS 元数据** 的工具。它能将 DJI 设备存储卡中的 SQLite 数据库转换为 CSV 格式，帮助数字影像工程师（DIT）正确管理摄影机元数据，特别适用于 **CINITY特制工作流**。
 
 ## ✨ 功能特性
 
