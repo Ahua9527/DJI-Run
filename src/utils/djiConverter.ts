@@ -5,7 +5,6 @@ async function loadDatabase(file: File) {
   const initSqlJsModule = await import("sql.js");
   const initSqlJsFn = initSqlJsModule.default || initSqlJsModule;
   const SQL = await initSqlJsFn({
-    // public 目录下的文件在部署后直接映射到根路径
     locateFile: (fileName) => `/${fileName}`
   });
   const buffer = await file.arrayBuffer();
@@ -37,19 +36,11 @@ function convertResultToCSV(result: any): string {
   return csvLines.join("\n");
 }
 
-/**
- * 合并 video_info_table 与 gis_info_table 表
- * 合并规则：
- *   - 先过滤 video_info_table 中 duration <= 0 的记录
- *   - INNER JOIN 两表，连接条件：v.ID = g.ID
- *   - 验证有效数据条数匹配
- */
 export async function convertDBtoMergedCSV(file: File): Promise<{ filename: string; data: Blob }> {
   const db = await loadDatabase(file);
 
   // 1. 检查字段并构建动态字段
   let projectFrameField = "";
-  let digitalEffectField = "";
   const pragmaResult = db.exec("PRAGMA table_info(video_info_table);");
   if (pragmaResult && pragmaResult.length > 0 && pragmaResult[0].values) {
     const columnsInfo: any[] = pragmaResult[0].values;
@@ -62,103 +53,77 @@ export async function convertDBtoMergedCSV(file: File): Promise<{ filename: stri
     } else {
       projectFrameField = "NULL";
     }
-
-    if (columnNames.includes("digital_effect")) {
-      digitalEffectField = "v.digital_effect";
-    } else {
-      digitalEffectField = "''";
-    }
   } else {
     projectFrameField = "NULL";
-    digitalEffectField = "''";
   }
 
-  // 2. 验证数据完整性
-  const validationQuery = `
-    SELECT 
-      (SELECT COUNT(*) FROM video_info_table WHERE duration > 0) as valid_video_count,
-      (SELECT COUNT(*) FROM video_info_table) as total_video_count,
-      (SELECT COUNT(*) FROM gis_info_table) as gis_count,
-      (
-        SELECT COUNT(*)
-        FROM video_info_table v
-        JOIN gis_info_table g ON v.ID = g.video_index
-        WHERE v.duration > 0
-      ) as matched_count;
-  `;
-  
-  const validationResult = db.exec(validationQuery);
-  if (!validationResult || !validationResult[0] || !validationResult[0].values || !validationResult[0].values[0]) {
-    throw new Error('无法验证数据表完整性');
-  }
-
-  const [validVideoCount, totalVideoCount, gisCount, matchedCount] = validationResult[0].values[0];
-
-  // 3. 验证数据
-  if (validVideoCount === 0) {
-    throw new Error('没有有效的视频记录(所有 duration 均为 0 或 -1)');
-  }
-
-  if (validVideoCount !== gisCount) {
-    throw new Error(
-      `数据不匹配: 有效视频记录数(${validVideoCount}) 与 GIS记录数(${gisCount}) 不一致。\n` +
-      `总视频记录数: ${totalVideoCount}, 有效视频记录数: ${validVideoCount}, GIS记录数: ${gisCount}`
-    );
-  }
-
-  if (matchedCount !== validVideoCount) {
-    throw new Error(
-      `基于video_index的匹配记录数(${matchedCount})与有效视频记录数(${validVideoCount})不一致\n` +
-      `这可能表明video_index与ID不完全匹配`
-    );
-  }
-
-  // 4. 执行合并查询，添加 ND 值转换
+  // 2. 执行合并查询
   const query = `
     SELECT
       g.file_name,
-      ${projectFrameField} AS "Project FPS",
-      CAST(v.frame_num AS FLOAT) / CAST(v.frame_den AS FLOAT) AS "Sensor FPS",
+      ${projectFrameField} AS "project_fps",
+      CAST(v.frame_num AS FLOAT) / CAST(v.frame_den AS FLOAT) AS "sensor_fps",
+      v.duration,
       v.resolution_width,
       v.resolution_height,
-      v.rotation,
-      v.encode_format,
-      v.shutter_integer,
+      '1/' || v.shutter_integer AS shutter_integer,
       v.ei_value,
       v.wb_count,
       v.wb_tint,
-      v.shutter_angle,
+      CAST(v.shutter_angle AS FLOAT) / 10.0 AS shutter_angle,
       CASE 
         WHEN v.nd_value = 0 THEN 'Clear'
         ELSE ROUND(LOG10(v.nd_value), 1)
       END AS nd_value,
-      v.aperture,
-      v.ev_bias,
-      v.shutter_type,
-      v.venc_type,
-      v.model_name,
-      ${digitalEffectField} AS digital_effect,
-      v.duration
+      CAST(v.aperture AS FLOAT) / 100.0 AS aperture,
+      v.model_name
     FROM video_info_table v
     JOIN gis_info_table g ON v.ID = g.video_index
-    WHERE v.duration > 0
     ORDER BY v.ID;
   `;
 
   const result = db.exec(query);
   let csvContent = "";
   if (result.length > 0) {
-    // 处理文件名，只保留最后一部分
+    // 处理文件名和格式化数值
     const processedResult = {
       columns: result[0].columns,
       values: result[0].values.map(row => {
-        if (row[0] != null) {
-          const filePath = String(row[0]);
-          const parts = filePath.split('/');
-          const lastPart = parts[parts.length - 1];
-          return [lastPart, ...row.slice(1)];
+        // 处理文件名
+        const filePath = row[0] != null ? String(row[0]) : "";
+        const parts = filePath.split('/');
+        const lastPart = parts[parts.length - 1];
+
+        // 处理 shutter_angle（在第10列）
+        const shutterAngle = row[10];
+        const formattedShutterAngle = typeof shutterAngle === 'number' 
+          ? shutterAngle.toFixed(1)
+          : shutterAngle;
+
+        // 处理 aperture（在第12列）
+        const aperture = row[12];
+        let formattedAperture = aperture;
+        if (typeof aperture === 'number') {
+          const apertureStr = aperture.toFixed(1).replace(/\.0$/, '');
+          const standardApertureValues = ['2.8', '3.2', '3.5', '4', '5.6', '8', '11', '16'];
+          if (standardApertureValues.includes(apertureStr)) {
+            formattedAperture = `F${apertureStr}`;
+          } else {
+            formattedAperture = `F ${apertureStr}`;
+          }
         }
-        return row;
+
+        return [
+          lastPart,
+          row[1],
+          row[2],
+          row[3],  // 直接使用原始帧数
+          ...row.slice(4, 10),
+          formattedShutterAngle,
+          row[11],
+          formattedAperture,
+          ...row.slice(13)
+        ];
       })
     };
     csvContent = convertResultToCSV([processedResult]);
