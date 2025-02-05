@@ -1,0 +1,56 @@
+{
+    "id": "/?source=pwa",
+    "name": "DJI-Run",
+    "short_name": "DJI-Run",
+    "description": "为每一帧元数据保驾护航",
+    "start_url": "/?source=pwa",
+    "display": "standalone",
+    "display_override": ["window-controls-overlay"],
+    "orientation": "any",
+    "scope": "/",
+    "background_color": "#F1F1F1",
+    "theme_color": "#F1F1F1",
+    "icons": [
+      {
+        "src": "apple-touch-icon.png",
+        "sizes": "180x180",
+        "type": "image/png"
+      },
+      {
+        "src": "DJI-Run_96_any.png",
+        "sizes": "96x96",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "DJI-Run_192_any.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "DJI-Run_512_any.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "DJI-Run_96_maskable.png",
+        "sizes": "96x96",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "DJI-Run_192_maskable.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "maskable"
+      },
+      {
+        "src": "DJI-Run_512_maskable.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      }
+    ]
+  }
