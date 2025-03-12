@@ -1,42 +1,51 @@
+/* 根容器样式设置 */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 1280px; /* 设置最大宽度为1280像素 */
+  margin: 0 auto; /* 上下边距为0，左右自动居中 */
+  padding: 2rem; /* 内边距设置为2rem，1rem通常等于16px */
+  text-align: center; /* 文本居中对齐 */
 }
 
+/* Logo图标样式 */
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 500ms;
+  height: 6em; /* 高度设置为6em，1em通常等于16px */
+  padding: 1.5em; /* 内边距设置为1.5em */
+  will-change: filter; /* 提示浏览器此元素的filter属性将发生变化，有助于优化性能 */
+  transition: filter 500ms; /* 设置filter属性变化时的过渡动画，持续500毫秒 */
 }
+/* Logo悬停效果 */
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #646cffaa); /* 鼠标悬停时添加紫色阴影效果 */
 }
+/* React Logo特定的悬停效果 */
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #61dafbaa); /* 鼠标悬停在React Logo上时添加蓝色阴影效果 */
 }
 
+/* 定义Logo旋转动画 */
 @keyframes logo-spin {
   from {
-    transform: rotate(0deg);
+    transform: rotate(0deg); /* 动画起始状态：旋转角度为0度 */
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(360deg); /* 动画结束状态：旋转角度为360度，即一整圈 */
   }
 }
 
+/* 根据用户设置应用Logo旋转动画 */
 @media (prefers-reduced-motion: no-preference) {
+  /* 当用户未设置减少动画时，对第二个链接中的Logo应用旋转动画 */
   a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+    animation: logo-spin infinite 20s linear; /* 应用无限循环的线性旋转动画，每20秒一个循环 */
   }
 }
 
+/* 卡片样式 */
 .card {
-  padding: 2em;
+  padding: 2em; /* 内边距设置为2em */
 }
 
+/* 文档阅读提示样式 */
 .read-the-docs {
-  color: #888;
+  color: #888; /* 设置文本颜色为淡灰色 */
 }
